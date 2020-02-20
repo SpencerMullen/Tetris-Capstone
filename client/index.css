@@ -1,0 +1,92 @@
+/* Initial Styles */
+* {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 62.5%;
+    box-sizing: border-box;
+}
+
+body {
+    padding: 0;
+    margin: 0;
+
+    height: 100vh;
+    width: 100vw;
+
+    background-color: #E0E0E0;
+}
+
+/* Navbar Styles */
+.nav {
+    width: 100vw;
+    height: 75px;
+    background-color: grey;
+    padding: 2.5rem;
+
+    display: flex;
+    justify-content: space-between;
+}
+
+.nav a {
+    text-decoration: none;
+    color: white;
+    font-size: 2rem;
+    margin: 0 5px;
+}
+
+/* Container Styles */
+.container {
+    width: 100vw;
+    height: calc(100vh - 75px);
+
+    display: flex;
+    justify-content: space-evenly;
+}
+
+/* Singleplayer & Multiplayer Box */
+.singleplayer, .multiplayer {
+    border: 5px solid #757575;
+    width: 45%;
+    /* height: 45%; */
+
+    margin-top: 50px;
+    padding: 20px;
+    
+
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+/* Gamemode Headers */
+.gamemode-header {
+    font-size: 3rem;
+    font-weight: 300;
+}
+
+/* Gamemodes Container */
+.gamemodes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    flex-grow: 1;
+}
+
+/* Gamemode Boxes */
+.gamemode {
+    padding: 25px;
+    background-color: #7986CB;
+
+    color: white;
+
+    font-size: 2.5rem;
+    width: 48%;
+
+    cursor: pointer;
+
+    border-radius: 10px;
+    margin-top: 10px;
+}
+
+.gamemode-big {
+    width: 100%;
+}

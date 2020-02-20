@@ -1,49 +1,48 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>Tetris</title>
-    <style>
-        body {
-            background: #000;
-            display: flex;
-            color: #fff;
-            font-family: sans-serif;
-            font-size: 2em;
-            text-align: center;
-        }
-
-        .player {
-            flex: 1 1 auto;
-        }
-
-        .player.local canvas{
-            border-color: #fff;
-        }
-
-        canvas {
-            border: solid .2em #707070;
-            height: 90vh;
-            margin: 0 5vw;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tetris Capstone</title>
+    <link rel="stylesheet" href="./index.css">
 </head>
 <body>
-    <!-- TODO: Make 3, 2, 1, Go with a button for player who created lobby to start | can only spectate when game has already started -->
-    <!-- TODO: Show upcoming blocks and allow for saving block -->
-    <!-- TODO: Add Ability to Change Tetris Settings -->
-
-    <template id="player-template">
-        <div class="player">
-            <div class="score"></div>
-            <canvas class="tetris" width="240" height="400"></canvas>
+    <div class="nav">
+        <div>
+            <a href="#">Home</a>
+            <a href="#">Leaderboard</a>
+            <a href="#">Settings</a>
         </div>
-    </template>
 
-    <script src="./tetris-manager.js"></script>
-    <script src="./connection-manager.js"></script>
-    <script src="./arena.js"></script>
-    <script src="./events.js"></script>
-    <script src="./player.js"></script>
-    <script src="./tetris.js"></script>
-    <script src="./main.js"></script>
+        <div class="login-options">
+            <a href="#">Register</a>
+            <a href="#">Login</a>
+        </div>
+    </div>
+
+    <!-- TODO: Add Authentication w/ Firebase -->
+    <!-- TODO: Add Background Images to Gamemode Buttons -->
+    <div class="container">
+        <div class="singleplayer">
+            <h1 class="gamemode-header">Singleplayer</h1>
+
+            <div class="gamemodes">
+                <button class="gamemode">Classic</button>
+                <button class="gamemode">Sprint</button>
+                <button class="gamemode">Marathon</button>
+                <button class="gamemode">Dig</button>
+            </div>
+        </div>
+
+        <div class="multiplayer">
+            <h1 class="gamemode-header">Multiplayer</h1>
+
+            <div class="gamemodes">
+                <button class="gamemode">1v1 Practice</button>
+                <button class="gamemode">1v1 Ranked</button>
+                <button class="gamemode gamemode-big" onclick="window.location.href='./tetris.html'">Free-For-All</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
