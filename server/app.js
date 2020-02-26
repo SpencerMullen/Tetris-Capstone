@@ -4,6 +4,9 @@ const path          = require('path')
 // start websocket
 require('./websockets/main')
 
+// require firebase
+require('./firebase.js')
+
 const port  = process.env.PORT || 8000
 const app   = express()
 

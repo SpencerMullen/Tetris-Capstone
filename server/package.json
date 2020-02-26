@@ -13,6 +13,7 @@
     "license": "ISC",
     "dependencies": {
         "express": "^4.17.1",
+        "firebase": "^7.9.1",
         "ws": "^7.2.1"
     },
     "devDependencies": {
