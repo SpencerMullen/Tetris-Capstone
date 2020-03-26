@@ -24,6 +24,12 @@ body {
 
     display: flex;
     justify-content: space-between;
+    align-items: center;
+}
+
+.login-options {
+    display: flex;
+    align-items: center;
 }
 
 .nav a {
@@ -31,6 +37,18 @@ body {
     color: white;
     font-size: 2rem;
     margin: 0 5px;
+    cursor: pointer;
+}
+
+.nav p {
+    color: #3F51B5;
+    font-size: 2rem;
+    margin: 0 5px;
+
+    background-color: white;
+    padding: 5px;
+
+    border-radius: 5px;
 }
 
 /* Container Styles */

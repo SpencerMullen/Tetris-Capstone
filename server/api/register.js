@@ -1,6 +1,8 @@
 const User      = require('../models/User')
 const router    = require('express').Router()
 const bcrypt    = require('bcryptjs')
+const jwt       = require('jsonwebtoken')
+const setCookie = require('../middleware/cookies')
 
 // GET /api/register
 // Register user
@@ -27,8 +29,12 @@ router.post('/', async (req, res) => {
 
         await newUser.save()
 
-        res.send(newUser)
+        const token = await jwt.sign({ _id: newUser.id }, process.env.JWT, { expiresIn: 86400 })
+        setCookie(res, token)
+        
+        res.redirect('/')
     } catch (e) {
+        console.log(e)
         res.status(500).send({ msg: e })
     }
 })
