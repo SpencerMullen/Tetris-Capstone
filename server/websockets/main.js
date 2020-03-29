@@ -22,7 +22,6 @@ function createSession(id = createId()) {
     if (sessions.has(id)) throw new Error(`Session ${id} already exists`)
 
     const session = new Session(id)
-    console.log('Creating session', session)
 
     sessions.set(id, session)
 
@@ -36,7 +35,6 @@ function getSession(id) {
 function broadcastSession(session) {
     const clients = [...session.clients]
     clients.forEach(client => {
-        console.log(client.id)
         client.send({
             type: 'session-broadcast',
             peers: {
@@ -50,38 +48,74 @@ function broadcastSession(session) {
     })
 }
 
+function startSession(session) {
+    const clients = [...session.clients]
+    clients.forEach(client => 
+        client.send({ type: 'session-start' })  
+    )
+}
+
+function newSession(client, state) {
+    const session = createSession()
+    session.join(client)
+    client.state = state
+
+    client.send({
+        type: 'session-created',
+        id: session.id
+    })
+}
+
+function joinSession(sessionId, client, state) {
+    const session = getSession(sessionId)
+
+    // if session is open, join it
+    if (session && session.clients.size < 2) {
+        session.join(client)
+        client.state = state
+
+        startSession(session)
+        broadcastSession(session)
+    } else {
+        console.log('looking for session')
+        // look for an open session to join
+        sessions.forEach(session => {
+            if (session.clients.size < 2) {
+                console.log('found session')
+
+                session.join(client)
+                client.state = state
+
+                client.send({
+                    type: 'session-joined',
+                    id: session.id
+                })
+
+                startSession(session)
+                broadcastSession(session)
+            }
+        })
+
+        // if no open sessions, create one
+        if (client.session === null) {
+            console.log('creating session')
+            newSession(client, state)
+        }
+    }
+}
+
 // runs whenever a client joins the server
 server.on('connection', conn => {
     const client = createClient(conn) // create client
-    console.log(`-------Connection Established: ${client.id} ---------`)
 
     // when the client sends a message
     conn.on('message', msg => {
         const data = JSON.parse(msg)
 
-        if (data.type === 'create-session') {
-            const session = createSession()
-            console.log('CREATING Session: ' + session.id)
-            session.join(client)
-            // console.log(session)
+        if (data.type === 'join-session') 
+            joinSession(data.id, client, data.state)
 
-            client.state = data.state
-
-            client.send({
-                type: 'session-created',
-                id: session.id
-            })
-        } else if (data.type === 'join-session') {
-            const session = getSession(data.id) || createSession(data.id)
-            console.log('JOINING Session: ' + session.id)
-            session.join(client)
-
-            // console.log(session)
-
-            client.state = data.state
-
-            broadcastSession(session)
-        } else if (data.type === 'state-update') {
+        else if (data.type === 'state-update') {
             const [prop, value] = data.state
             client.state[data.fragment][prop] = value
             client.broadcast(data)
@@ -90,8 +124,6 @@ server.on('connection', conn => {
 
     // when the client leaves the session
     conn.on('close', () => {
-        console.log('Connection Closed')
-
         const session = client.session
         if (session) {
             session.leave(client)

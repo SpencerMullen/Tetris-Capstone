@@ -35,5 +35,9 @@ app.use(express.static(path.join(__dirname, '..', 'client')))
 
 app.listen(port, () => console.log(`App running on localhost:${port}....`))
 
-// TODO: Add Login / Auth 
-// TODO: Add DB so users can save tetris settings
+// TODO: Waiting for other player msg when player is alone in lobby | Make 3, 2, 1, Go 
+// TODO: Hold Block
+// TODO: Show upcoming blocks 
+// TODO: Gargbage block sent to other player
+// TODO: Add Ability to Change Tetris Settings
+// TODO: Make rank functional

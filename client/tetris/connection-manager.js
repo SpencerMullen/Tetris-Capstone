@@ -8,19 +8,14 @@ class ConnectionManager {
     }
 
     initSession() {
-        const sessionId = window.location.hash.split('#')[1]
+        const sessionId = window.location.hash.split('#')[1] || ''
         const state = this.localTetris.serialize()
-        if (sessionId) 
-            this.send({
-                type: 'join-session',
-                id: sessionId,
-                state
-            })
-        else 
-            this.send({
-                type: 'create-session',
-                state
-            })
+
+        this.send({
+            type: 'join-session',
+            id: sessionId,
+            state
+        })
     }
 
     connect(address) {
@@ -33,7 +28,6 @@ class ConnectionManager {
         })
 
         this.conn.addEventListener('message', event => {
-            console.log(`Recieved Message: `, event.data)
             this.receive(event.data) 
         })
     }
@@ -101,17 +95,25 @@ class ConnectionManager {
 
     receive(msg) {
         const data = JSON.parse(msg)
-        if (data.type === 'session-created')
+        if (data.type !== 'state-update')
+            console.log(`Recieved Message: `, event.data)
+
+        if (data.type === 'session-created' || data.type === 'session-joined')
             window.location.hash = data.id
+        else if (data.type === 'session-start')
+            this.localTetris.run()
         else if (data.type === 'session-broadcast')
             this.updateManager(data.peers)
         else if (data.type === 'state-update')
             this.updatePeer(data.clientId, data.fragment, data.state)
     }
 
-    send(data) {
+    send(data) {        
         const msg = JSON.stringify(data)
-        console.log(`Sending Message: ${msg}`)
+
+        if (data.type !== 'state-update')
+            console.log(`Sending Message: ${msg}`)
+
         this.conn.send(msg)
     }
 }
