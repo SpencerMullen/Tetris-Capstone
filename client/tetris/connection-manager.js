@@ -83,7 +83,7 @@ class ConnectionManager {
     }
 
     updatePeer(id, fragment, [prop, value]) {
-        if (!this.peers.has(id)) return console.error('Client does not exit')
+        if (!this.peers.has(id)) return console.error('Client does not exist')
         
         const tetris = this.peers.get(id)
 
@@ -104,6 +104,8 @@ class ConnectionManager {
             this.localTetris.run()
         else if (data.type === 'session-broadcast')
             this.updateManager(data.peers)
+        else if (data.type === 'session-starting')
+            this.localTetris.countdown(data.countdown)
         else if (data.type === 'state-update')
             this.updatePeer(data.clientId, data.fragment, data.state)
     }

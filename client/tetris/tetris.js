@@ -10,6 +10,8 @@ class Tetris
         this.arena = new Arena(12, 20);
         this.player = new Player(this);
 
+        this.started = false
+
         this.player.events.listen('score', score =>
             this.updateScore(score)
         )
@@ -36,7 +38,6 @@ class Tetris
             requestAnimationFrame(this._update);
         };
         
-
         this.updateScore(0);
     }
 
@@ -46,7 +47,7 @@ class Tetris
         this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
         this.drawMatrix(this.arena.matrix, {x: 0, y: 0});
-        this.drawMatrix(this.player.matrix, this.player.pos);
+        this.drawMatrix(this.player.matrix || [], this.player.pos);
     }
 
     drawMatrix(matrix, offset)
@@ -64,6 +65,7 @@ class Tetris
     }
 
     run() {
+        this.player.reset()
         this._update()
     }
 
@@ -80,11 +82,21 @@ class Tetris
         }
     }
 
+    countdown(countdown) {
+        console.log('countdown', countdown)
+
+        // this.context.font = "20px Georgia";
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
+        this.context.fillStyle = 'white';
+        this.context.fillText(countdown, 14, 0)
+    }
+
     deserialize(state) {
         this.arena = Object.assign(state.arena)
         this.player = Object.assign(state.player)
 
         this.updateScore(this.player.score)
+
         this.draw()
     }
 

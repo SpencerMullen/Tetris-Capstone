@@ -37,6 +37,7 @@ function broadcastSession(session) {
     clients.forEach(client => {
         client.send({
             type: 'session-broadcast',
+            started: session.started,
             peers: {
                 you: client.id,
                 clients: clients.map(client => ({ 
@@ -49,10 +50,36 @@ function broadcastSession(session) {
 }
 
 function startSession(session) {
+
     const clients = [...session.clients]
-    clients.forEach(client => 
-        client.send({ type: 'session-start' })  
-    )
+
+    let countdown = 3
+
+    let startInterval = setInterval(function() {
+        if (countdown === 0) {
+            clearInterval(startInterval)
+
+            clients.forEach(client => 
+                client.send({ type: 'session-start' })
+            )
+        }
+
+        clients.forEach(client => 
+            client.send({
+                type: 'session-starting',
+                countdown,
+                peers: {
+                    you: client.id,
+                    clients: clients.map(client => ({ 
+                        id: client.id,
+                        state: client.state
+                    }))
+                }
+            })  
+        )
+
+        countdown--
+    }, 1000)
 }
 
 function newSession(client, state) {
