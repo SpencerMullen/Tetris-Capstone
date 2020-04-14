@@ -19,18 +19,52 @@
             border-color: #fff;
         }
 
+        .tetris-main-container {
+            display: flex;
+            justify-content: center;
+            max-width: 45vw;
+            margin: 5vh 1.25vw 0 2.5vw;
+            height: 90vh;
+        }
+
         canvas {
             border: solid .2em #707070;
+        }
+
+        .tetris-container {
+            /* width: 340px;
+            height: 500px; */
+            margin: 0 1.5vw;
+        }
+
+        .tetris {
             height: 90vh;
-            margin: 0 5vw;
+        }
+
+        .tetris-text {
+            font-size: 32px;
         }
     </style>
 </head>
 <body>
     <template id="player-template">
         <div class="player">
-            <div class="score"></div>
-            <canvas class="tetris" width="240" height="400"></canvas>
+            <div class="tetris-main-container">
+                <div class="tetris-hold-container">
+                    <h1 class="tetris-text">Hold</h1>
+                    <canvas class="tetris-hold" width="100" height="80"></canvas>
+                </div>
+                
+                <div class="tetris-container">
+                    <!-- <div class="score"></div> -->
+                    <canvas class="tetris" width="240" height="400"></canvas>
+                </div>
+                
+                <div class="tetris-next-container">
+                    <h1 class="tetris-text">Next</h1>
+                    <canvas class="tetris-next" width="100" height="160"></canvas>
+                </div>
+            </div>
         </div>
     </template>
 

@@ -16,6 +16,9 @@ class Player
         this.pos = {x: 0, y: 0};
         this.matrix = null;
         this.score = 0;
+
+        this.canHold = true
+        this.heldPiece = null
     }
 
     createPiece(type) {
@@ -64,6 +67,18 @@ class Player
         }
     }
 
+    hold() {
+        console.log('called hold')
+
+        const heldPiece = this.matrix
+        this.reset(this.heldPiece)
+        this.heldPiece = heldPiece
+        this.canHold = false
+        this.tetris.holdCanvasContext.clearRect(0, 0, this.tetris.holdCanvas.width, this.tetris.holdCanvas.height)
+
+        this.tetris.drawMatrix(this.tetris.holdCanvasContext, this.heldPiece, { x: 0, y: 0 })
+    }
+
     drop()
     {
         this.pos.y++;
@@ -72,6 +87,7 @@ class Player
             this.pos.y--;
             this.arena.merge(this);
             this.reset();
+            this.canHold = true
             this.score += this.arena.sweep();
             this.events.emit('score', this.score);
             return -1
@@ -87,10 +103,12 @@ class Player
         }
     }
 
-    reset()
+    reset(matrix)
     {
+        console.log('called reset')
+
         const pieces = 'ILJOTSZ';
-        this.matrix = this.createPiece(pieces[pieces.length * Math.random() | 0]);
+        this.matrix = matrix || this.createPiece(pieces[pieces.length * Math.random() | 0])
         this.pos.y = 0;
         this.pos.x = (this.arena.matrix[0].length / 2 | 0) -
                      (this.matrix[0].length / 2 | 0);

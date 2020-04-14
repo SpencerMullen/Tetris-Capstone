@@ -7,6 +7,7 @@ connectionManager.connect(`ws://${window.location.hostname}:3000`)
 
 const keyListener = (event) => {
     const player = localTetris.player
+
     if (event.type === 'keydown') {
         if (event.keyCode === 37) // left arrow - move left
             player.move(-1);
@@ -14,6 +15,10 @@ const keyListener = (event) => {
             player.move(1);
         else if (event.keyCode === 38) // up arrow - rotate
             player.rotate(1);
+        else if (event.keyCode === 67) {
+            if (player.canHold) 
+                player.hold()
+        }
     }
 
     // down arrow - drop
