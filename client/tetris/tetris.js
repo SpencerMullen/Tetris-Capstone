@@ -14,6 +14,7 @@ class Tetris
         this.nextCanvasContext = this.nextCanvas.getContext('2d');
         
         this.holdCanvasContext.scale(25, 25);
+        this.nextCanvasContext.scale(20, 20);
 
         this.arena = new Arena(12, 20);
         this.player = new Player(this);
@@ -50,13 +51,24 @@ class Tetris
         this.updateScore(0);
     }
 
-    draw()
+    draw(otherPlayer=false)
     {
         this.context.fillStyle = '#000';
         this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
         this.drawMatrix(this.context, this.arena.matrix, {x: 0, y: 0});
         this.drawMatrix(this.context, this.player.matrix || [], this.player.pos);
+
+        if (otherPlayer){
+            if (this.player['hold-piece']) {
+                this.holdCanvasContext.clearRect(0, 0, this.holdCanvas.width, this.holdCanvas.height)
+                this.drawMatrix(this.holdCanvasContext, this.player['hold-piece'], { x: 0, y: 0 })
+            }
+            if (this.player['next-pieces']) {
+                this.nextCanvasContext.clearRect(0, 0, this.nextCanvas.width, this.nextCanvas.height)
+                this.drawMatrix(this.nextCanvasContext, this.player['next-pieces'], { x: 1, y: 0 })
+            }
+        }
     }
 
     drawMatrix(context, matrix, offset)

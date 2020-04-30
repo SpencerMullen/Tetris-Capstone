@@ -10,6 +10,9 @@ class Player
         this.tetris = tetris;
         this.arena = tetris.arena;
 
+        this.bag = []
+        this.bagIndex = 0
+
         this.dropCounter = 0;
         this.dropInterval = this.DROP_SLOW;
 
@@ -19,8 +22,11 @@ class Player
 
         this.canHold = true
         this.heldPiece = null
+
+        this.nextPieces = []
     }
 
+    // returns matrix given piece letter
     createPiece(type) {
         if (type === 'T') {
             return [
@@ -67,16 +73,18 @@ class Player
         }
     }
 
+    // holds current piece
     hold() {
-        console.log('called hold')
-
-        const heldPiece = this.matrix
-        this.reset(this.heldPiece)
+        const heldPiece = this.matrix // sets held piece to current piece
+        this.reset(this.heldPiece) // calls reset with currently held piece (either next piece will be held piece or next piece)
         this.heldPiece = heldPiece
         this.canHold = false
-        this.tetris.holdCanvasContext.clearRect(0, 0, this.tetris.holdCanvas.width, this.tetris.holdCanvas.height)
 
+        // resets canvas and draws new held piece
+        this.tetris.holdCanvasContext.clearRect(0, 0, this.tetris.holdCanvas.width, this.tetris.holdCanvas.height)
         this.tetris.drawMatrix(this.tetris.holdCanvasContext, this.heldPiece, { x: 0, y: 0 })
+
+        this.events.emit('hold-piece', this.heldPiece)
     }
 
     drop()
@@ -103,23 +111,53 @@ class Player
         }
     }
 
+    // gets next piece
+    getNextPiece() {
+        const piece = this.bag[this.bagIndex] // gets piece at current index
+        
+        // if current index is within 7 of the end of the bag, send event to update bag and add more pieces
+        if (this.bagIndex >= this.bag.length - 7) 
+            this.events.emit('get-bag', this.bagIndex)
+
+        return this.createPiece(piece)
+    }
+
+    updateNextPieces() {
+        this.nextPieces = []
+        const nextPieces = this.bag.slice(++this.bagIndex, this.bagIndex+5) // returns array with next 5 pieces
+
+        // loops through the pieces and create a matrix for each and append to this.nextPieces array
+        for (let i = 0; i < nextPieces.length; i++) {
+            const piece = this.createPiece(nextPieces[i])
+            this.nextPieces = this.nextPieces.concat(piece).concat([[0]])
+        }
+
+        // remove last element which is just the [[0]] from the concat
+        this.nextPieces.pop()
+    }
+
     reset(matrix)
     {
-        console.log('called reset')
-
-        const pieces = 'ILJOTSZ';
-        this.matrix = matrix || this.createPiece(pieces[pieces.length * Math.random() | 0])
+        this.matrix = matrix || this.getNextPiece() // if a matrix was passed in, use that as the next piece -- if not getNextPiece()
         this.pos.y = 0;
         this.pos.x = (this.arena.matrix[0].length / 2 | 0) -
                      (this.matrix[0].length / 2 | 0);
+
         if (this.arena.collide(this)) {
             this.arena.clear();
             this.score = 0;
         }
+
+        this.updateNextPieces() // update next pieces array
+
+        // clear next pieces canvas and draw new next pieces
+        this.tetris.nextCanvasContext.clearRect(0, 0, this.tetris.nextCanvas.width, this.tetris.nextCanvas.height)
+        this.tetris.drawMatrix(this.tetris.nextCanvasContext, this.nextPieces, { x:1, y:0 })
         
         this.events.emit('pos', this.pos);
         this.events.emit('matrix', this.matrix);
         this.events.emit('score', this.score);
+        this.events.emit('next-pieces', this.nextPieces)
     }
 
     rotate(dir)

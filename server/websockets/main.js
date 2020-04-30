@@ -18,10 +18,10 @@ function createClient(conn, id = createId()) {
     return new Client(conn, id)
 }
 
-function createSession(id = createId()) {
+function createSession(gameType, id = createId()) {
     if (sessions.has(id)) throw new Error(`Session ${id} already exists`)
 
-    const session = new Session(id)
+    const session = new Session(id, gameType)
 
     sessions.set(id, session)
 
@@ -60,7 +60,10 @@ function startSession(session) {
             clearInterval(startInterval)
 
             clients.forEach(client => 
-                client.send({ type: 'session-start' })
+                client.send({ 
+                    type: 'session-start',
+                    bag: session.bag 
+                })
             )
         }
 
@@ -82,8 +85,8 @@ function startSession(session) {
     }, 1000)
 }
 
-function newSession(client, state) {
-    const session = createSession()
+function newSession(gameType, client, state) {
+    const session = createSession(gameType)
     session.join(client)
     client.state = state
 
@@ -93,21 +96,25 @@ function newSession(client, state) {
     })
 }
 
-function joinSession(sessionId, client, state) {
+function joinSession(gameType, sessionId, client, state) {
     const session = getSession(sessionId)
 
     // if session is open, join it
     if (session && session.clients.size < 2) {
-        session.join(client)
-        client.state = state
-
-        startSession(session)
-        broadcastSession(session)
+        if (session.gameType === 'ranked') {
+            client.send({ type: 'ranked-join-failed' })
+        } else {
+            session.join(client)
+            client.state = state
+    
+            startSession(session)
+            broadcastSession(session)
+        }
     } else {
         console.log('looking for session')
         // look for an open session to join
         sessions.forEach(session => {
-            if (session.clients.size < 2) {
+            if (session.clients.size < 2 && session.gameType === gameType) {
                 console.log('found session')
 
                 session.join(client)
@@ -126,7 +133,7 @@ function joinSession(sessionId, client, state) {
         // if no open sessions, create one
         if (client.session === null) {
             console.log('creating session')
-            newSession(client, state)
+            newSession(gameType, client, state)
         }
     }
 }
@@ -139,13 +146,36 @@ server.on('connection', conn => {
     conn.on('message', msg => {
         const data = JSON.parse(msg)
 
+        // fixing error with gameType cutting off last letter
+        if (data.gameType === 'ranke') data.gameType = 'ranked'
+        else if (data.gameType === 'custo') data.gameType = 'custom'
+
         if (data.type === 'join-session') 
-            joinSession(data.id, client, data.state)
+            joinSession(data.gameType, data.id, client, data.state)
 
         else if (data.type === 'state-update') {
             const [prop, value] = data.state
             client.state[data.fragment][prop] = value
             client.broadcast(data)
+        }
+
+        else if (data.type === 'get-bag') {
+            const session = client.session
+
+            // if client is within 10 pieces of the server's bag
+            if (data.position >= session.bag.length - 10) {
+                session.updateBag()
+
+                client.send({
+                    type: 'bag-update',
+                    bag: session.bag
+                })
+
+                client.broadcast({
+                    type: 'bag-update',
+                    bag: session.bag
+                })
+            }      
         }
     })
 

@@ -7,12 +7,22 @@ class ConnectionManager {
         this.localTetris = [...this.tetrisManager.instances][0]
     }
 
+    getGameType() {
+        const href = window.location.href
+        const urlParams = href.slice(href.indexOf('?'), href.indexOf('#')).split('=')
+        if (urlParams.length === 0) window.location.href = ''
+        
+        return urlParams[1]
+    }
+
     initSession() {
+        const gameType = this.getGameType()
+    
         const sessionId = window.location.hash.split('#')[1] || ''
         const state = this.localTetris.serialize()
-
         this.send({
             type: 'join-session',
+            gameType: gameType,
             id: sessionId,
             state
         })
@@ -32,11 +42,14 @@ class ConnectionManager {
         })
     }
 
+    // when the player (local) emits an event, it will be received here
     watchEvents() {
         const player = this.localTetris.player;
 
-        ['pos', 'matrix', 'score'].forEach(prop => {
-            player.events.listen(prop, value => 
+        // for each of the following events, set up an event listener (because they follow the same format)
+        ['pos', 'matrix', 'score', 'hold-piece', 'next-pieces'].forEach(prop => {
+            player.events.listen(prop, value =>
+                // this.send sends a message to server
                 this.send({
                     type: 'state-update',
                     fragment: 'player',
@@ -45,6 +58,14 @@ class ConnectionManager {
             )
         })
 
+        player.events.listen('get-bag', position => 
+            this.send({
+                type: 'get-bag',
+                position
+            })
+        )
+
+        // send your updated arena state to server so it can be shown for the other players (who aren't you)
         const arena = this.localTetris.arena;
         ['matrix'].forEach(prop => {
             arena.events.listen(prop, value => {
@@ -82,6 +103,7 @@ class ConnectionManager {
         this.tetrisManager.sortPlayers(sorted)
     }
 
+    // update element of other players tetris arena
     updatePeer(id, fragment, [prop, value]) {
         if (!this.peers.has(id)) return console.error('Client does not exist')
         
@@ -90,31 +112,36 @@ class ConnectionManager {
         tetris[fragment][prop] = value
 
         if (prop === 'score') tetris.updateScore(value)
-        tetris.draw()
+        tetris.draw(true)
     }
 
     receive(msg) {
         const data = JSON.parse(msg)
-        if (data.type !== 'state-update')
-            console.log(`Recieved Message: `, event.data)
-
-        if (data.type === 'session-created' || data.type === 'session-joined')
+        // if (data.type !== 'state-update')
+        //     console.log(`Recieved Message: `, event.data)
+        
+        if (data.type === 'ranked-join-failed') window.location.href = '../'
+        else if (data.type === 'session-created' || data.type === 'session-joined')
             window.location.hash = data.id
-        else if (data.type === 'session-start')
+        else if (data.type === 'session-start') {
+            this.localTetris.player.bag = data.bag
             this.localTetris.run()
+        }
         else if (data.type === 'session-broadcast')
             this.updateManager(data.peers)
         else if (data.type === 'session-starting')
             this.localTetris.countdown(data.countdown)
         else if (data.type === 'state-update')
             this.updatePeer(data.clientId, data.fragment, data.state)
+        else if (data.type === 'bag-update')
+            this.localTetris.player.bag = data.bag
     }
 
     send(data) {        
         const msg = JSON.stringify(data)
 
-        if (data.type !== 'state-update')
-            console.log(`Sending Message: ${msg}`)
+        // if (data.type !== 'state-update')
+        //     console.log(`Sending Message: ${msg}`)
 
         this.conn.send(msg)
     }
