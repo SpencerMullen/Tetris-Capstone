@@ -58,6 +58,10 @@ class ConnectionManager {
             )
         })
 
+        player.events.listen('ready', () => {
+            this.send({ type: 'ready' })
+        })
+
         player.events.listen('get-bag', position => 
             this.send({
                 type: 'get-bag',
@@ -118,11 +122,14 @@ class ConnectionManager {
     receive(msg) {
         const data = JSON.parse(msg)
         // if (data.type !== 'state-update')
-        //     console.log(`Recieved Message: `, event.data)
+        // console.log(`Recieved Message: `, event.data)
         
         if (data.type === 'ranked-join-failed') window.location.href = '../'
         else if (data.type === 'session-created' || data.type === 'session-joined')
             window.location.hash = data.id
+        else if (data.type === 'get-ready') {
+            this.localTetris.getReady()
+        }
         else if (data.type === 'session-start') {
             this.localTetris.player.bag = data.bag
             this.localTetris.run()

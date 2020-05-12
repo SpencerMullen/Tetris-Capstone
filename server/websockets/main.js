@@ -49,6 +49,16 @@ function broadcastSession(session) {
     })
 }
 
+function getReady(session) {
+    const clients = [...session.clients]
+
+    clients.forEach(client => 
+        client.send({ 
+            type: 'get-ready'
+        })
+    )
+}
+
 function startSession(session) {
 
     const clients = [...session.clients]
@@ -107,7 +117,7 @@ function joinSession(gameType, sessionId, client, state) {
             session.join(client)
             client.state = state
     
-            startSession(session)
+            getReady(session)
             broadcastSession(session)
         }
     } else {
@@ -125,7 +135,7 @@ function joinSession(gameType, sessionId, client, state) {
                     id: session.id
                 })
 
-                startSession(session)
+                getReady(session)
                 broadcastSession(session)
             }
         })
@@ -136,6 +146,17 @@ function joinSession(gameType, sessionId, client, state) {
             newSession(gameType, client, state)
         }
     }
+}
+
+// check if both clients are ready before starting game
+function checkGameReady(session) {
+    let ready = true;
+
+    [...session.clients].forEach(client => {
+        if (!client.ready) ready = false
+    })
+
+    if (ready) startSession(session)
 }
 
 // runs whenever a client joins the server
@@ -153,6 +174,12 @@ server.on('connection', conn => {
         if (data.type === 'join-session') 
             joinSession(data.gameType, data.id, client, data.state)
 
+        else if (data.type === 'ready') {
+            client.ready = true
+
+            checkGameReady(client.session)
+        }
+        
         else if (data.type === 'state-update') {
             const [prop, value] = data.state
             client.state[data.fragment][prop] = value

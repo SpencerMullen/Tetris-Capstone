@@ -3,7 +3,7 @@ class Client {
         this.conn = conn
         this.id = id
         this.session = null,
-        
+        this.ready = false
         this.state = null
     }
 

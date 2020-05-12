@@ -51,6 +51,32 @@ class Tetris
         this.updateScore(0);
     }
 
+    getReady() {
+        setTimeout(() => {
+            const $button = $("#ready_btn")
+            const $canvas = $('.player.local .tetris-container canvas')
+            
+            let index
+            $.each($('.player'), function(i) {
+                if ($(this).hasClass('local')) index = i
+            })
+
+            let { top, left } = $canvas.position()
+
+            top = top + (($canvas.height() - $button.width()) / 2)
+
+            if (index === 1) left = left - $(window).height() * .075;
+            left = left + (($canvas.width() - $button.width()) / 2)
+
+            $button.css({ top, left, position:'absolute' })
+            $button.removeClass('hidden')
+            $button.click(() => { 
+                this.player.events.emit('ready')
+                $button.addClass('hidden')
+            })
+        }, 500)
+    }
+
     draw(otherPlayer=false)
     {
         this.context.fillStyle = '#000';

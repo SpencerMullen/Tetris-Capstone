@@ -44,6 +44,21 @@
         .tetris-text {
             font-size: 32px;
         }
+
+        .hidden {
+            display: none;
+        }
+
+        #ready_btn {
+            width: 200px; 
+            height: 50px; 
+            background-color: white; 
+            color: black; 
+            border:0; 
+            cursor: pointer;
+            font-size: 24px;
+        }
+
     </style>
 </head>
 <body>
@@ -68,6 +83,9 @@
         </div>
     </template>
 
+    <button class="hidden" id="ready_btn">Ready</button>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
     <script src="./tetris-manager.js"></script>
     <script src="./connection-manager.js"></script>
     <script src="./arena.js"></script>
