@@ -121,12 +121,9 @@ function joinSession(gameType, sessionId, client, state) {
             broadcastSession(session)
         }
     } else {
-        console.log('looking for session')
         // look for an open session to join
         sessions.forEach(session => {
             if (session.clients.size < 2 && session.gameType === gameType) {
-                console.log('found session')
-
                 session.join(client)
                 client.state = state
 
@@ -142,7 +139,6 @@ function joinSession(gameType, sessionId, client, state) {
 
         // if no open sessions, create one
         if (client.session === null) {
-            console.log('creating session')
             newSession(gameType, client, state)
         }
     }
@@ -161,6 +157,7 @@ function checkGameReady(session) {
 
 // runs whenever a client joins the server
 server.on('connection', conn => {
+
     const client = createClient(conn) // create client
 
     // when the client sends a message
@@ -203,6 +200,20 @@ server.on('connection', conn => {
                     bag: session.bag
                 })
             }      
+        }
+
+        else if (data.type === 'send-garbage') {
+            const garbage = data.garbage
+            const session = client.session
+            const clients = [...session.clients]
+
+            clients.forEach(c => {
+                if (client.id !== c.id) 
+                    c.send({
+                        type: 'receive-garbage',
+                        garbage
+                    })
+            })
         }
     })
 
