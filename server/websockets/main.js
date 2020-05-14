@@ -155,6 +155,18 @@ function checkGameReady(session) {
     if (ready) startSession(session)
 }
 
+function endGame(winner) {
+    const session = winner.session
+    const players = [...session.clients]
+
+    players.forEach(p => 
+        p.send({
+            type: 'gameOver',
+            winner: winner.id
+        })
+    )
+}
+
 // runs whenever a client joins the server
 server.on('connection', conn => {
 
@@ -178,6 +190,11 @@ server.on('connection', conn => {
         }
         
         else if (data.type === 'state-update') {
+            const session = client.session
+
+            if (session.clients.size < 2)
+                endGame(client)
+
             const [prop, value] = data.state
             client.state[data.fragment][prop] = value
             client.broadcast(data)
@@ -213,6 +230,16 @@ server.on('connection', conn => {
                         type: 'receive-garbage',
                         garbage
                     })
+            })
+        }
+
+        else if (data.type === 'player-lost') {
+            const session = client.session
+            const clients = [...session.clients]
+
+            clients.forEach(c => {
+                if (c.id !== client.id)
+                    endGame(client)
             })
         }
     })

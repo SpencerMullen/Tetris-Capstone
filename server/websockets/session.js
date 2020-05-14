@@ -2,7 +2,7 @@ class Session {
     constructor(id, gameType) {
         this.id = id
         this.gameType = gameType
-    
+        
         this.clients = new Set
        
         this.bag = []
