@@ -24,6 +24,8 @@ class Player
         this.heldPiece = null
 
         this.nextPieces = []
+
+        this.gameRunning = false
     }
 
     // returns matrix given piece letter
@@ -91,15 +93,18 @@ class Player
     {
         this.pos.y++;
         this.dropCounter = 0
+
         if (this.arena.collide(this)) {
+            console.log("player x pos:", this.pos.x)
             this.pos.y--;
             this.arena.merge(this);
+            this.score += this.arena.sweep(this);
             this.reset();
             this.canHold = true
-            this.score += this.arena.sweep();
             this.events.emit('score', this.score);
             return -1
         }
+
         this.events.emit('pos', this.pos)
     }
 
@@ -146,6 +151,8 @@ class Player
         if (this.arena.collide(this)) {
             this.arena.clear();
             this.score = 0;
+            this.gameOver = true
+            this.events.emit('player-lost')
         }
 
         this.updateNextPieces() // update next pieces array

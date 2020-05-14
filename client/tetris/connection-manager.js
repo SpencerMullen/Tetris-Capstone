@@ -2,6 +2,7 @@ class ConnectionManager {
     constructor(tetrisManager) {
         this.conn = null
         this.peers = new Map
+        this.clientId = null
 
         this.tetrisManager = tetrisManager
         this.localTetris = [...this.tetrisManager.instances][0]
@@ -69,6 +70,17 @@ class ConnectionManager {
             })
         )
 
+        player.events.listen('send-garbage', garbage => 
+            this.send({
+                type: 'send-garbage',
+                garbage
+            })
+        )
+
+        player.events.listen('player-lost', () => {
+            this.send({ type: 'player-lost' })
+        })
+
         // send your updated arena state to server so it can be shown for the other players (who aren't you)
         const arena = this.localTetris.arena;
         ['matrix'].forEach(prop => {
@@ -84,6 +96,7 @@ class ConnectionManager {
 
     updateManager(peers) {
         const me = peers.you // get your client's id
+        this.clientId = me
         const clients = peers.clients.filter(({ id }) => id !== me) // filter out your id from client ids list
 
         // loop through clients and add any that haven't already been added
@@ -121,15 +134,15 @@ class ConnectionManager {
 
     receive(msg) {
         const data = JSON.parse(msg)
-        // if (data.type !== 'state-update')
-        // console.log(`Recieved Message: `, event.data)
+        // if (data.type === 'garbage-rec')
+        //     console.log(`Recieved Message: `, event.data)
         
         if (data.type === 'ranked-join-failed') window.location.href = '../'
         else if (data.type === 'session-created' || data.type === 'session-joined')
             window.location.hash = data.id
-        else if (data.type === 'get-ready') {
+        else if (data.type === 'get-ready')
             this.localTetris.getReady()
-        }
+        
         else if (data.type === 'session-start') {
             this.localTetris.player.bag = data.bag
             this.localTetris.run()
@@ -142,13 +155,18 @@ class ConnectionManager {
             this.updatePeer(data.clientId, data.fragment, data.state)
         else if (data.type === 'bag-update')
             this.localTetris.player.bag = data.bag
+        else if (data.type === 'receive-garbage')
+            this.localTetris.addGarbage(data.garbage)
+        else if (data.type === 'gameOver') {
+            console.log(this.clientId) // client id for future use - check if we are the winner
+        }
     }
 
     send(data) {        
         const msg = JSON.stringify(data)
 
         // if (data.type !== 'state-update')
-        //     console.log(`Sending Message: ${msg}`)
+        // console.log(`Sending Message: ${msg}`)
 
         this.conn.send(msg)
     }

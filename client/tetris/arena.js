@@ -45,10 +45,31 @@ class Arena
         this.events.emit('matrix', this.matrix)
     }
 
-    sweep()
+    sweep(player)
     {
+        function createGarbage(rows) {
+            const player = this
+
+            let garbage = rows
+            const emptyX = player.pos.x
+            console.log("player x pos:", emptyX)
+
+            for (let y = 0; y < garbage.length; y++) {
+                for (let x = 0; x < garbage[y].length; x++) {
+                    if (x === emptyX) garbage[y][x] = 0
+                    else garbage[y][x] = 9
+                }
+            }
+
+            if (garbage.length < 4) garbage = garbage.slice(0, garbage.length-1)
+
+            player.events.emit('send-garbage', garbage)
+        }
+
         let rowCount = 1;
         let score = 0;
+        let clearedRows = []
+
         outer: for (let y = this.matrix.length - 1; y > 0; --y) {
             for (let x = 0; x < this.matrix[y].length; ++x) {
                 if (this.matrix[y][x] === 0) {
@@ -56,15 +77,20 @@ class Arena
                 }
             }
 
-            const row = this.matrix.splice(y, 1)[0].fill(0);
-            this.matrix.unshift(row);
+            const row = this.matrix.splice(y, 1)[0]
+            clearedRows.push([...row])
+
+            const newRow = row.fill(0)
+            this.matrix.unshift(newRow)
             ++y;
 
-            score += rowCount * 10;
-            rowCount *= 2;
+            score += rowCount * 10
+            rowCount *= 2
         }
 
+        if (clearedRows.length >= 2) createGarbage.call(player, clearedRows)
+
         this.events.emit('matrix', this.matrix)
-        return score;
+        return score
     }
 }

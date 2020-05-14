@@ -34,7 +34,8 @@ class Tetris
             '#FFA500',
             '#FFFF00',
             '#0000FF',
-            "#FFFFFF"
+            "#FFFFFF",
+            "#757575"
         ];
 
         let lastTime = 0;
@@ -45,7 +46,7 @@ class Tetris
             this.player.update(deltaTime);
 
             this.draw();
-            requestAnimationFrame(this._update);
+            this.player.runningGame = requestAnimationFrame(this._update);
         };
         
         this.updateScore(0);
@@ -75,6 +76,18 @@ class Tetris
                 $button.addClass('hidden')
             })
         }, 500)
+    }
+
+    addGarbage(garbage) {
+        this.arena.matrix = this.arena.matrix.slice(garbage.length)
+        for (let i = 0; i < garbage.length; i++) 
+            this.arena.matrix.push(garbage[i])
+        
+        console.log("GARBAGE:")
+        console.table(garbage)
+        console.log("NEW ARENA WITH GARBAGE:")
+        console.table(this.arena.matrix)
+        this.arena.events.emit('matrix', this.arena.matrix)
     }
 
     draw(otherPlayer=false)
@@ -112,6 +125,7 @@ class Tetris
     }
 
     run() {
+        this.player.gameRunning = true
         this.player.reset()
         this._update()
     }
@@ -130,8 +144,6 @@ class Tetris
     }
 
     countdown(countdown) {
-        console.log('countdown', countdown)
-
         this.context.font = "8px Arial";
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
         this.context.fillStyle = 'white';
