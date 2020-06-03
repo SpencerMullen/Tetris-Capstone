@@ -155,18 +155,6 @@ function checkGameReady(session) {
     if (ready) startSession(session)
 }
 
-function endGame(winner) {
-    const session = winner.session
-    const players = [...session.clients]
-
-    players.forEach(p => 
-        p.send({
-            type: 'gameOver',
-            winner: winner.id
-        })
-    )
-}
-
 // runs whenever a client joins the server
 server.on('connection', conn => {
 
@@ -238,8 +226,10 @@ server.on('connection', conn => {
             const clients = [...session.clients]
 
             clients.forEach(c => {
-                if (c.id !== client.id)
-                    endGame(client)
+                c.send({
+                    type: 'gameOver',
+                    loser: client.id
+                })
             })
         }
     })
