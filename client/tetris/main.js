@@ -5,7 +5,7 @@ const localTetris = tetrisManager.createPlayer()
 localTetris.element.classList.add('local')
 
 const connectionManager = new ConnectionManager(tetrisManager)
-connectionManager.connect(`ws://${window.location.hostname}:${$('#port').val()}`)
+connectionManager.connect()
 
 const keyListener = (event) => {
     const player = localTetris.player

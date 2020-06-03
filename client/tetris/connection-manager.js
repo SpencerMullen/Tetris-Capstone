@@ -29,8 +29,10 @@ class ConnectionManager {
         })
     }
 
-    connect(address) {
-        this.conn = new WebSocket(address)
+    connect() {
+        let host
+        host = (location.protocol !== 'https:') ? location.origin.replace(/^http/, 'ws') : location.origin.replace(/^https/, 'ws')
+        this.conn = new WebSocket(host)
 
         this.conn.addEventListener('open', () => {
             console.log('Connection Established')

@@ -18,8 +18,6 @@ mongoose
 // server config
 const port  = process.env.PORT || 8000
 const app   = express()
-app.set('view engine', 'ejs')
-app.set('views', path.join(__dirname, '/client/tetris'))
 app.use(cors());
 app.use(express.static(path.join(__dirname, 'client')))
 app.use(express.json())
@@ -32,7 +30,6 @@ app.use('/api/logout', require('./api/logout'))
 app.use('/api/auth', require('./api/auth'))
 
 app.get('/', (req, res) => res.redirect('/index.html'))
-app.get('/tetris', (req, res) => res.render('index', { port }))
 
 let s = app.listen(port, () => console.log(`App running on localhost:${port}....`))
 
