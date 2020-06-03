@@ -149,7 +149,7 @@ class Player
                      (this.matrix[0].length / 2 | 0);
 
         if (this.arena.collide(this)) {
-            this.arena.clear();
+            // this.arena.clear();
             this.score = 0;
             this.gameOver = true
             this.events.emit('player-lost')

@@ -158,7 +158,8 @@ class ConnectionManager {
         else if (data.type === 'receive-garbage')
             this.localTetris.addGarbage(data.garbage)
         else if (data.type === 'gameOver') {
-            console.log(this.clientId) // client id for future use - check if we are the winner
+            console.log(this.clientId, data.loser)
+            this.localTetris.stop(this.clientId === data.loser)
         }
     }
 

@@ -1,3 +1,5 @@
+MicroModal.init()
+
 const tetrisManager = new TetrisManager(document)
 const localTetris = tetrisManager.createPlayer()
 localTetris.element.classList.add('local')

@@ -42,9 +42,8 @@ class Tetris
         this._update = (time = 0) => {
             const deltaTime = time - lastTime;
             lastTime = time;
-
+            
             this.player.update(deltaTime);
-
             this.draw();
             this.player.runningGame = requestAnimationFrame(this._update);
         };
@@ -82,16 +81,13 @@ class Tetris
         this.arena.matrix = this.arena.matrix.slice(garbage.length)
         for (let i = 0; i < garbage.length; i++) 
             this.arena.matrix.push(garbage[i])
-        
-        console.log("GARBAGE:")
-        console.table(garbage)
-        console.log("NEW ARENA WITH GARBAGE:")
-        console.table(this.arena.matrix)
+
         this.arena.events.emit('matrix', this.arena.matrix)
     }
 
     draw(otherPlayer=false)
     {
+
         this.context.fillStyle = '#000';
         this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
@@ -128,6 +124,14 @@ class Tetris
         this.player.gameRunning = true
         this.player.reset()
         this._update()
+    }
+
+    stop(lost) {
+        this.player.gameRunning = false
+        cancelAnimationFrame(this.player.runningGame)
+
+        $('#gameover-text').text(lost ? "You Lost!" : "You Won!")
+        MicroModal.show('gameover-modal')
     }
 
     serialize() {
