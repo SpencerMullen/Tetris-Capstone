@@ -22,6 +22,7 @@ mongoose
 const port  = process.env.PORT || 8000
 const app   = express()
 app.use(cors());
+app.use(express.static("client"))
 app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(cookieParser(process.env.COOKIE))
