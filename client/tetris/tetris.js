@@ -27,15 +27,15 @@ class Tetris
 
         this.colors = [
             null,
-            '#FF0000',
-            '#00FFFF',
-            '#00FF00',
-            '#AA00FF',
-            '#FFA500',
-            '#FFFF00',
-            '#0000FF',
-            "#FFFFFF",
-            "#757575"
+            '#AC33FF', // T Piece
+            '#F9FF33', // O Piece
+            '#FFAB33', // L Piece
+            '#334EFF', // J Piece
+            '#33EBFF', // I Piece
+            '#33FF57', // S Piece
+            '#FF3333', // Z Piece
+            "#FFFFFF", // White
+            "#757575" // Garbage
         ];
 
         let lastTime = 0;
@@ -65,7 +65,7 @@ class Tetris
 
             top = top + (($canvas.height() - $button.width()) / 2)
 
-            if (index === 1) left = left - $(window).height() * .075;
+            if (index === 1) left = left - $(window).height() * 0.01;
             left = left + (($canvas.width() - $button.width()) / 2)
 
             $button.css({ top, left, position:'absolute' })
