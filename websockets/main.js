@@ -181,8 +181,12 @@ module.exports = function(s) {
             else if (data.type === 'state-update') {
                 const session = client.session
     
-                if (session.clients.size < 2)
-                    endGame(client)
+                if (session.clients.size < 2) {
+                    client.send({
+                        type: 'gameOver',
+                        loser: 'sadf09asdf'
+                    })
+                }
     
                 const [prop, value] = data.state
                 client.state[data.fragment][prop] = value
