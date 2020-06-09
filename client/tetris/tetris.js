@@ -5,7 +5,7 @@ class Tetris
         this.element = element;
         this.canvas = element.querySelector('canvas.tetris');
         this.context = this.canvas.getContext('2d');
-        this.context.scale(20, 20);
+        this.context.scale(24, 24);
 
         this.holdCanvas = element.querySelector('canvas.tetris-hold')
         this.holdCanvasContext = this.holdCanvas.getContext('2d');
@@ -16,7 +16,7 @@ class Tetris
         this.holdCanvasContext.scale(25, 25);
         this.nextCanvasContext.scale(20, 20);
 
-        this.arena = new Arena(12, 20);
+        this.arena = new Arena(10, 20);
         this.player = new Player(this);
 
         this.started = false
@@ -151,7 +151,7 @@ class Tetris
         this.context.font = "8px Arial";
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
         this.context.fillStyle = 'white';
-        this.context.fillText(countdown, 4, 10)
+        this.context.fillText(countdown, 3, 10)
     }
 
     deserialize(state) {
