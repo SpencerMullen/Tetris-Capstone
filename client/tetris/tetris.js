@@ -5,7 +5,7 @@ class Tetris
         this.element = element;
         this.canvas = element.querySelector('canvas.tetris');
         this.context = this.canvas.getContext('2d');
-        this.context.scale(24, 24);
+        this.context.scale(24, 20);
 
         this.holdCanvas = element.querySelector('canvas.tetris-hold')
         this.holdCanvasContext = this.holdCanvas.getContext('2d');
@@ -42,7 +42,7 @@ class Tetris
         this._update = (time = 0) => {
             const deltaTime = time - lastTime;
             lastTime = time;
-            
+
             this.player.update(deltaTime);
             this.draw();
             this.player.runningGame = requestAnimationFrame(this._update);
