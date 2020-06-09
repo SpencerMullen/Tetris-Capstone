@@ -94,6 +94,28 @@ class Tetris
         this.drawMatrix(this.context, this.arena.matrix, {x: 0, y: 0});
         this.drawMatrix(this.context, this.player.matrix || [], this.player.pos);
 
+        let ctx = this.context
+
+        let w = ctx.canvas.width
+        let h = ctx.canvas.height
+
+        console.log(w, h)
+
+        ctx.strokeStyle = "#FFF"
+        ctx.lineWidth = .0005
+        
+        for (let x=0; x<=10;x++) {
+            for (let y=0;y<=20;y++) {
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, h);
+                ctx.stroke();
+                ctx.beginPath()
+                ctx.moveTo(0, y);
+                ctx.lineTo(w, y);
+                ctx.stroke();
+            }
+        }
+
         if (otherPlayer){
             if (this.player['hold-piece']) {
                 this.holdCanvasContext.clearRect(0, 0, this.holdCanvas.width, this.holdCanvas.height)
